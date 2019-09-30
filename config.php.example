@@ -1,0 +1,21 @@
+<?php
+/* database name */
+define('SERVER_NAME', '');
+
+/* database name */
+define('DB_NAME', '');
+
+/* database username */
+define('DB_USERNAME', '');
+
+/* database password */
+define('DB_PASSWORD', '');
+
+/* admin name */
+define('USERNAME', '');
+
+/* admin password */
+define('PASSWORD', '');
+
+
+?>
