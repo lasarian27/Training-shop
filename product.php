@@ -2,15 +2,16 @@
 $title = 'Product page';
 require_once('layout.php');
 ['connectDB' => $connect_db] = require_once('common.php');
+
 // Check if image file is a actual image or fake image
 if(isset($_POST["submit"])) {
     $target_dir = "images/";
     $target_file = $target_dir . uniqid() . basename($_FILES["fileToUpload"]["name"]);
+    echo $target_file;
     $uploadOk = 1;
     $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
     $check = getimagesize($_FILES["fileToUpload"]["tmp_name"]);
     if($check !== false) {
-        echo "File is an image - " . $check["mime"] . ".";
         $uploadOk = 1;
     } else {
         echo "File is not an image.";
@@ -39,14 +40,15 @@ if(isset($_POST["submit"])) {
     } else {
         if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
             echo "The file ". basename( $_FILES["fileToUpload"]["name"]). " has been uploaded.";
+            $sql = "INSERT INTO `products` (`title`, `description`, `price`, `image`) VALUES (?,?,?,?)";
+            $stmt = $connect_db()->prepare($sql);
+            $a = 123;
+            $stmt->bind_param("ssss", $_POST['title'], $_POST['description'], $_POST['price'], $a);
+            $stmt->execute();
         } else {
             echo "Sorry, there was an error uploading your file.";
         }
     }
-    /*$sql = "INSERT INTO products (title, description, price, image) VALUES (?,?,?)";
-    $stmt = mysqli_prepare($sql);
-    $stmt->bind_param("sss", $_POST['title'], $_POST['description'], $_POST['price'], $target_file);
-    $stmt->execute();*/
 }
 ?>
 
