@@ -1,69 +1,95 @@
 <?php
-$title = 'Product page';
-require_once('layout.php');
-['connectDB' => $connect_db] = require_once('common.php');
+require_once 'languages/en.php'; 
+$title = $product_page['title'];
+require_once 'layout.php';
+require_once 'common.php';
+session_start();
 
-// Check if image file is a actual image or fake image
-if(isset($_POST["submit"])) {
-    $target_dir = "images/";
-    $target_file = $target_dir . uniqid() . basename($_FILES["fileToUpload"]["name"]);
-    echo $target_file;
-    $uploadOk = 1;
-    $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
-    $check = getimagesize($_FILES["fileToUpload"]["tmp_name"]);
-    if($check !== false) {
-        $uploadOk = 1;
-    } else {
-        echo "File is not an image.";
-        $uploadOk = 0;
-    }
-    // Check if file already exists
-    if (file_exists($target_file)) {
-        echo "Sorry, file already exists.";
-        $uploadOk = 0;
+if (!isset($_SESSION["admin"])) {
+    header("Location: http://localhost");
+    exit; // prevent further execution
 }
-    // Check file size
-    if ($_FILES["fileToUpload"]["size"] > 500000) {
-        echo "Sorry, your file is too large.";
-        $uploadOk = 0;
-    }
-    // Allow certain file formats
-    if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
-    && $imageFileType != "gif" ) {
-        echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
-        $uploadOk = 0;
-    }
-    // Check if $uploadOk is set to 0 by an error
-    if ($uploadOk == 0) {
-        echo "Sorry, your file was not uploaded.";
-    // if everything is ok, try to upload file
-    } else {
-        if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
-            echo "The file ". basename( $_FILES["fileToUpload"]["name"]). " has been uploaded.";
-            $sql = "INSERT INTO `products` (`title`, `description`, `price`, `image`) VALUES (?,?,?,?)";
-            $stmt = $connect_db()->prepare($sql);
-            $a = 123;
-            $stmt->bind_param("ssss", $_POST['title'], $_POST['description'], $_POST['price'], $a);
-            $stmt->execute();
-        } else {
-            echo "Sorry, there was an error uploading your file.";
+
+$product_title = '';
+$product_description = '';
+$product_price = '';
+
+switch ($_GET['action']){
+    case 'create':
+        if(isset($_POST['submit'])){
+            // Check if image file is a actual image or fake image
+            $image_checked = imageValidator();
+
+            if($image_checked['upload_ok'])
+            {
+                $sql = "INSERT INTO `products` (`title`, `description`, `price`, `image`) VALUES (?,?,?,?)";
+                $stmt = $connect_db->prepare($sql);
+                $stmt->bind_param("ssds", $_POST['title'], $_POST['description'], $_POST['price'], $image_checked["image_name"]);
+                echo $stmt->execute() ?  "The product was inserted in db" : "There was an error on trying to insert the new product in db";
+            }
         }
+        break;
+    case 'edit':
+        if(isset($_GET['id'])){
+            $id = $_GET['id'];
+            $id = mysqli_real_escape_string($connect_db,$id);
+            $sql = "SELECT * FROM `products` WHERE `id`='" . $id . "'";
+            $result = $connect_db->query($sql);
+            $result = $result->fetch_assoc();
+            $product_title = $result['title'];
+            $product_description = $result['description'];
+            $product_price = $result['price'];
+            $product_image = $result['image'];
+
+            if(isset($_POST["submit"]))
+            {
+                $image_checked = imageValidator();
+                $id = mysqli_real_escape_string($connect_db,$id);
+                $sql = "UPDATE `products`  SET `title`=?, `description`=?, `price`=?, `image`=? WHERE `id`='" . $id . "'";
+                $stmt = $connect_db->prepare($sql);
+         
+                $product_image = $image_checked['upload_ok'] ? 
+                $image_checked["image_name"] : $product_image;
+
+                $stmt->bind_param("ssds", 
+                    $_POST['title'], 
+                    $_POST['description'], 
+                    $_POST['price'], 
+                    $product_image
+                );
+                echo $stmt->execute() ?  $product_page['good_message'] : $product_page['wrong_message'];
+            }
+               
+        }
+       
+        break;
+    case 'delete':
+        if(isset($_GET['id'])){
+            $id = $_GET['id'];
+            $id = mysqli_real_escape_string($connect_db,$id);
+            $sql = "DELETE FROM `products` WHERE `id`='" . $id . "'";
+            $connect_db->query($sql);
+           
+            header("Location: http://localhost/products.php");
+        }
+
+        break;
+    default:
+        break;
     }
-}
 ?>
 
 <div class="container">
 
-<form action="product.php" method="post" class="form-group" enctype="multipart/form-data">
-    <input type="text" placeholder="Title" name="title" class="form-control" required>
+<form action="<?php echo $_SERVER['REQUEST_URI'] ?>" method="post" class="form-group" enctype="multipart/form-data">
+    <input type="text" placeholder="<?php echo $product_page['form_title'] ?>" value="<?php echo $product_title ?>" name="title" class="form-control" required>
+    <input type="text" placeholder="<?php echo $product_page['form_description'] ?>" value="<?php echo $product_description ?>" name="description" class="form-control" required>
 
-    <input type="text" placeholder="Description" name="description" class="form-control" required>
-
-    <input type="number" placeholder="Price" name="price" class="form-control" required>
+    <input type="number" step="any" placeholder="<?php echo $product_page['form_price'] ?>" value="<?php echo $product_price ?>"name="price" class="form-control" required>
     
     <input type="file" name="fileToUpload" class="form-control-file" id="formFile">
 
-    <a href="index.php"  name="submit">Products</a>
-    <button type="submit" value="click"  name="submit">Save</button>
+    <a href="products.php"  name="submit"><?php echo $product_page['products'] ?></a>
+    <button type="submit" value="click"  name="submit"><?php echo $product_page['save'] ?></button>
 </form>
 </div>

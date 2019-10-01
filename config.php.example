@@ -1,5 +1,5 @@
 <?php
-/* database name */
+/* server name */
 define('SERVER_NAME', '');
 
 /* database name */
@@ -16,6 +16,9 @@ define('USERNAME', '');
 
 /* admin password */
 define('PASSWORD', '');
+
+/* shop manager email */
+define('MANAGER_EMAIL', '');
 
 
 ?>
