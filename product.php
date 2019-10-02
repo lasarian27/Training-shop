@@ -48,7 +48,7 @@ switch ($_GET['action']){
                 $id = mysqli_real_escape_string($connect_db,$id);
                 $sql = "UPDATE `products`  SET `title`=?, `description`=?, `price`=?, `image`=? WHERE `id`='" . $id . "'";
                 $stmt = $connect_db->prepare($sql);
-         
+        
                 if($image_checked['upload_ok'])
                 {
                     unlink($product_image);
