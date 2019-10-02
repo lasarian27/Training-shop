@@ -1,17 +1,17 @@
 <?php
-require_once 'languages/en.php'; 
+require_once 'languages/en.php';
 $title = $home_page['title'];
 require_once 'layout.php';
 require_once 'common.php';
-session_start();
 
-// Logged out user automattically in case of 'logout' action or $_SESSION['loggedin] is false
+// Logged out user automattically in case of 'logout' action
 if (!isset($_SESSION['loggedin']) || !$_SESSION['loggedin'] || 
     (isset($_GET['action']) && $_GET['action'] === 'logout')
 )
 {
+    // On logout, destroy the session and redirect to login page
     session_destroy();
-    header("Location: http://localhost/login");
+    header("Location: http://localhost/login.php");
     die();
 }
 
@@ -21,6 +21,7 @@ if(isset($_GET['action']) && $_GET['action'] === "add" && isset($_GET['id']) && 
     $_SESSION['cart'][] = $_GET['id'];
 }
 
+// Get all products from db
 $sql = "SELECT id, title, description, price, image FROM products";
 $result = $connect_db->query($sql);
 

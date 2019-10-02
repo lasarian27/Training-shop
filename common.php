@@ -1,7 +1,12 @@
 <?php 
 require_once 'config.php';
+// Start php $_SESSION
+session_start();
+
+// Make a mysqli connection with credentials from 'config.php'
 $connect_db = new mysqli(SERVER_NAME, DB_USERNAME, DB_PASSWORD, DB_NAME);
 
+// Checking an image by size and formats
 function imageValidator($image_validator_errors) 
 {
     $target_dir = "images/";
@@ -13,26 +18,25 @@ function imageValidator($image_validator_errors)
         $uploadOk = 1;
         // Check file size
         if ($_FILES["fileToUpload"]["size"] > 500000) {
-            echo $image_validator_errors['filte_too_large'];
+            $_SESSION["messages"][] = $image_validator_errors['filte_too_large'];
             $uploadOk = 0;
         }
         // Allow certain file formats
         if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
         && $imageFileType != "gif" ) {
-            echo $image_validator_errors['wrong_format'];
+            $_SESSION["messages"][] = $image_validator_errors['wrong_format'];
             $uploadOk = 0;
         }
             // Check if $uploadOk is set to 0 by an error
         if ($uploadOk == 0) {
-            echo $image_validator_errors['upload_failed'];
+            $_SESSION["messages"][] = $image_validator_errors['upload_failed'];
         // if everything is ok, try to upload file
         } else {
             if (!move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {            
-                echo $image_validator_errors['upload_failed'];
+                $_SESSION["messages"][] = $image_validator_errors['upload_failed'];
             }
         }
     } else {
-        echo $image_validator_errors['image_error'];
         $uploadOk = 0;
     }
    
@@ -42,6 +46,7 @@ function imageValidator($image_validator_errors)
     ];
 }
 
+// Generate html code depends on a specific page
 function showProduct($products, $cart, $pageName, $text_page)
 {
     echo "<table class='table'> 
@@ -55,7 +60,9 @@ function showProduct($products, $cart, $pageName, $text_page)
                 </tr>
             </thead>
             <tbody>";
+    // Generate the code for each product
     foreach($products as $product) {
+        // Skip the product if its already in $_SESSION['cart']
         $condition = $pageName === 'index' ? !in_array($product['id'],$cart) : true;
         if($condition){
             echo "
@@ -64,7 +71,7 @@ function showProduct($products, $cart, $pageName, $text_page)
                 <td>".$product['title'] ."</td>
                 <td>".$product['description']."</td>
                 <td>".$product['price']."$</td>";
-
+                // Depends on the page print specific code
                 switch ($pageName){
                     case 'index':
                         echo "<td><a href='index.php?action=add&id=" . $product['id'] . "' class='btn btn-primary'>" . $text_page['add_button'] . "</a></td>";
@@ -84,7 +91,7 @@ function showProduct($products, $cart, $pageName, $text_page)
         }
     }
     echo "</tbody></table>";
-    
+    // Depends on the page print specific code
     switch ($pageName){
         case 'index':
             echo  "<a href='cart.php' class='btn btn-dark' style='margin: 10px;'>" . $text_page['go_to_cart'] . "</a>" . 
@@ -94,23 +101,22 @@ function showProduct($products, $cart, $pageName, $text_page)
             echo  "<a href='product.php?action=create' class='btn btn-primary' style='margin: 10px;'>" . $text_page['add'] . "</a>" . 
             "<a href='index.php?action=logout' class='btn btn-dark' style='margin: 10px;''>" . $text_page['logout'] . "</a>";
             break;
-        case 'cart':
-            echo 
-            "<form action='cart.php' method='post'>
-                <input type='text' placeholder='" . $text_page['name'] . "' style='margin-bottom: 10px;' name='name' class='form-control' required>
-
-                <input type='email' placeholder='" . $text_page['contact'] . "' style='margin-bottom: 10px;' name='email' class='form-control' required>
-                
-                <textarea class='form-control' style='margin-bottom: 10px;' name='comments' placeholder='" . $text_page['comments'] . "' rows='3' required></textarea>
-
-                <button type='submit' value='click' class='btn btn-dark' style='margin: 10px;' name='submit'>" . $text_page['checkout'] . "</button>
-            </form>" . 
-            "<a href='index.php' class='btn btn-dark' style='margin: 10px;'>" . $text_page['go_home'] . "</a>"
-            ;
-            break;
         default:
             break;
     }
   
+}
+
+// Show different messages
+function showMessages()
+{
+    // Print all messages that $_SESSION['messages'] contains
+    if(isset($_SESSION['messages']) && count($_SESSION['messages'])){
+        array_map(function($el){
+           echo $el;
+       }, $_SESSION['messages']);
+    // Once printed out, the session is cleared
+    $_SESSION['messages'] = [];
+   }
 }
 ?>

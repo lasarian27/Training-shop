@@ -5,7 +5,9 @@ $login_page = [
     "username_placeholder" => "Enter Username",
     "password_placeholder" => "Enter Password",
     "login_button" => "Login",
-    "credentials_error" => "Credentials are wrong"
+    "credentials_error" => "Credentials are wrong",
+    "username_required" => "Username is required",
+    "password_required" => "Password is required"
 ];
 
 /* Home page */
@@ -26,7 +28,13 @@ $cart_page = [
     "comments" => "Comments",
     "checkout" => "Checkout",
     "go_home" => "Go home",
-    "remove" => "Remove"
+    "remove" => "Remove",
+    "name_required" => "Name is required",
+    "email_required" => "Email is required",
+    "comments_required" => "Comments is required",
+    "mail_sended" => "The email was sent ",
+    "mail_failed" => "It was a problem on sending the email"
+
 ];
 
 /* Products page */
@@ -48,17 +56,20 @@ $product_page = [
     "form_title" => "Title",
     "form_description" => "Description",
     "form_price" =>"Price",
-    "update_product" => "The new product was updated successfully",
+    "update_product" => "The product was updated successfully",
     "update_product_error" => "There was an error on trying to update the product",
     "product_created" => "The product was inserted in db",
-    "product_error" => "There was an error on trying to insert the new product in db"
+    "product_error" => "There was an error on trying to insert the new product in db",
+    "title_required" => "Title is required",
+    "description_required" => "Description is required",
+    "price_required" => "Price is required",
+    "image_required" => "Image is required"
 ];
 
 $image_validator_errors = [
     "file_to_large" => "Sorry, your file is too large.",
     "wrong_format" => "Sorry, only JPG, JPEG, PNG & GIF files are allowed.",
-    "upload_failer" => "Sorry, your file was not uploaded.",
-    "image_error" => "The new file was`nt uploaded."
+    "upload_failer" => "Sorry, your file was not uploaded."
 ]
 
 ?>
