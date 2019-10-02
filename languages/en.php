@@ -1,10 +1,12 @@
 <?php
 /* Login page */
-$login_title = "Login page";
-$username_placeholder = "Enter Username";
-$password_placeholder = "Enter Password";
-$login_button = "Login";
-$credentials_error = "Credentials are wrong";
+$login_page = [
+    "title" => "Login page",
+    "username_placeholder" => "Enter Username",
+    "password_placeholder" => "Enter Password",
+    "login_button" => "Login",
+    "credentials_error" => "Credentials are wrong"
+];
 
 /* Home page */
 $home_page = [
@@ -33,7 +35,8 @@ $products_page = [
     "edit" => "Edit",
     "delete" => "Delete",
     "add" => "Add",
-    "logout" => "Logout"
+    "logout" => "Logout",
+
 ];
 
 /* Product page */
@@ -45,8 +48,17 @@ $product_page = [
     "form_title" => "Title",
     "form_description" => "Description",
     "form_price" =>"Price",
-    "good_message" => "The new product was updated successfully",
-    "wrong_message" => "There was an error on trying to update the product"
+    "update_product" => "The new product was updated successfully",
+    "update_product_error" => "There was an error on trying to update the product",
+    "product_created" => "The product was inserted in db",
+    "product_error" => "There was an error on trying to insert the new product in db"
 ];
+
+$image_validator_errors = [
+    "file_to_large" => "Sorry, your file is too large.",
+    "wrong_format" => "Sorry, only JPG, JPEG, PNG & GIF files are allowed.",
+    "upload_failer" => "Sorry, your file was not uploaded.",
+    "image_error" => "The new file was`nt uploaded."
+]
 
 ?>
