@@ -3,6 +3,7 @@ require_once 'languages/en.php';
 $title = $cart_page['title'];
 require_once 'layout.php';
 require_once 'common.php';
+require_once 'config.php';
 
 // Print out all messages from $_SESSION["messages"]
 showMessages();
@@ -47,46 +48,33 @@ if(count($products_cart)){
         }, $fields);
 
         // Prepare the data for sending the mail
+
         $to      = MANAGER_EMAIL;
         $name = $_POST['name'];
         $comments =  $_POST['comments'];
         $headers = "MIME-Version: 1.0" . "\r\n";
-        $headers .=  "Content-type: text/plain; charset=UTF-8" . "\r\n"; 
+        $headers .=  "Content-type: text/html; charset=UTF-8" . "\r\n"; 
         $headers .= "From: " . $_POST['email'] . "\r\n";
         $html = "<table class='table'> 
             <thead>
                 <tr>
-                    <th scope='col'>Image</th>
-                    <th scope='col'>Name</th>
-                    <th scope='col'>Description</th>
-                    <th scope='col'>Price</th>
-                    <th scope='col'>Actions</th>
+                    <th scope='col'>" . $cart_page['image'] . "</th>
+                    <th scope='col'>" . $cart_page['name'] . "</th>
+                    <th scope='col'>" . $cart_page['description'] . "</th>
+                    <th scope='col'>" . $cart_page['price'] . "</th>
                 </tr>
             </thead>
             <tbody>";
             foreach($result as $product) {
                 $html .= "
                 <tr>
-                    <td><img src='". $product['image'] ."' style='width:50px; height:50px;'/></td>
+                    <td><img src='http://" . SERVER_NAME . "/". $product['image'] ."' style='width:50px; height:50px;'/></td>
                     <td>".$product['title'] ."</td>
                     <td>".$product['description']."</td>
                     <td>".$product['price']."$</td>
-                    <td><a href='cart.php?action=remove&id=" . $product['id'] . "'class='btn btn-danger'>" . $cart_page['remove'] . "</a></td>
                 </tr>";
             }
-            $html .= "
-                </tbody></table>
-                    <form action='cart.php' method='post'>
-                        <input type='text' placeholder='" . $cart_page['name'] . "' style='margin-bottom: 10px;' name='name' class='form-control' required>
-        
-                        <input type='email' placeholder='" . $cart_page['contact'] . "' style='margin-bottom: 10px;' name='email' class='form-control' required>
-                        
-                        <textarea class='form-control' style='margin-bottom: 10px;' name='comments' placeholder='" . $cart_page['comments'] . "' rows='3' required></textarea>
-        
-                        <button type='submit' value='click' class='btn btn-dark' style='margin: 10px;' name='submit'>" . $cart_page['checkout'] . "</button>
-                    </form>
-                <a href='index.php' class='btn btn-dark' style='margin: 10px;'>" . $cart_page['go_home'] . "</a>"
-                    ;
+           
         // If all fields are'nt empty send the mail and show a specific message
         if($contact['name'] && $contact['email'] && $contact['comments'])
         {
