@@ -28,6 +28,8 @@ $result = $connect_db->query($sql);
 if ($result->num_rows > 0) {
     // output data
     showProduct($result, $_SESSION['cart'], str_replace(['/','.php'],'',$_SERVER['PHP_SELF']), $home_page);
-} 
+} else {
+    echo "<h6 style='margin:10px 0'>" . $home_page['products_not_found'] . "</h6>";
+}
 
 ?>

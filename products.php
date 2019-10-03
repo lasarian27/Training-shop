@@ -15,10 +15,7 @@ if (!isset($_SESSION["admin"])) {
 $sql = "SELECT id, title, description, price, image FROM products";
 $result = $connect_db->query($sql);
 
-if ($result->num_rows > 0) {
-    // output data in the page
-    showProduct($result, $_SESSION['cart'], str_replace(['/','.php'],'',$_SERVER['PHP_SELF']), $products_page);
-
-}
+// output data in the page
+showProduct($result, $_SESSION['cart'], str_replace(['/','.php'],'',$_SERVER['PHP_SELF']), $products_page);
 
 ?>

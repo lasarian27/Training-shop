@@ -20,7 +20,8 @@ $home_page = [
     "image" => "Image",
     "description" => "Description",
     "price" => "Price",
-    "actions" => "Actions"
+    "actions" => "Actions",
+    "products_not_found" => "No products found, contact the manager for more information"
 ];
 
 /* Cart page */
