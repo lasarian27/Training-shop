@@ -6,6 +6,7 @@ require_once 'common.php';
 
 // Print out all messages from $_SESSION["messages"]
 showMessages();
+
 $contact = [
     'name' => isset($_POST['name']) ? $_POST['name'] : '' ,
     'email' => isset($_POST['email']) ? $_POST['email'] : '' ,
@@ -21,16 +22,16 @@ if(isset($_GET['action']) && $_GET['action'] === "remove" && isset($_GET['id']))
     });
 }
 
-$cart_products = $_SESSION['cart'];
+$products_cart = $_SESSION['cart'];
 // If the cart is not empty, get some products, with this ids '$_SESSION['cart']' from db
 // Otherwise inform the user that the cart is empty
-if(count($cart_products)){
-    $sql = "SELECT * FROM products WHERE `id` IN  (".implode(',',$cart_products).")";
+if(count($products_cart)){
+    $sql = "SELECT * FROM products WHERE `id` IN  (".implode(',',$products_cart).")";
     $result = $connect_db->query($sql);
     
     if ($result->num_rows > 0) {
         // output data of each row
-        showProduct($result, $cart_products, str_replace(['/','.php'],'',$_SERVER['PHP_SELF']), $cart_page);
+        showProduct($result, $products_cart, str_replace(['/','.php'],'',$_SERVER['PHP_SELF']), $cart_page);
     } 
 
     // If the request is submit, send mail to manager
@@ -100,7 +101,7 @@ if(count($cart_products)){
 
    
 ?>
-<?php if(count($cart_products)): ?>
+<?php if(count($products_cart)): ?>
     <form action="cart.php" method="post">
         <input type="text" placeholder="<?php echo $cart_page['name'] ?>" style="margin-bottom: 10px;" name="name" value="<?php echo $contact['name'] ?>" class="form-control">
         <p style="color:red"><?php echo isset($_SESSION['name']) ?  $_SESSION['name'] : ""?></p>

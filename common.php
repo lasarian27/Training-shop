@@ -52,11 +52,11 @@ function showProduct($products, $cart, $pageName, $text_page)
     echo "<table class='table'> 
             <thead>
                 <tr>
-                    <th scope='col'>Image</th>
-                    <th scope='col'>Name</th>
-                    <th scope='col'>Description</th>
-                    <th scope='col'>Price</th>
-                    <th scope='col'>Actions</th>
+                    <th scope='col'>" . $text_page['image'] . "</th>
+                    <th scope='col'>" . $text_page['name'] . "</th>
+                    <th scope='col'>" . $text_page['description'] . "</th>
+                    <th scope='col'>" . $text_page['price'] . "</th>
+                    <th scope='col'>" . $text_page['actions'] . "</th>
                 </tr>
             </thead>
             <tbody>";

@@ -15,7 +15,12 @@ $home_page = [
     "title" => "Home page",
     "add_button" => "Add",
     "go_to_cart" => "Go to cart",
-    "logout" => "Logout"
+    "logout" => "Logout",
+    "name" => "Name",
+    "image" => "Image",
+    "description" => "Description",
+    "price" => "Price",
+    "actions" => "Actions"
 ];
 
 /* Cart page */
@@ -33,8 +38,12 @@ $cart_page = [
     "email_required" => "Email is required",
     "comments_required" => "Comments is required",
     "mail_sended" => "The email was sent ",
-    "mail_failed" => "It was a problem on sending the email"
-
+    "mail_failed" => "It was a problem on sending the email",
+    "name" => "Name",
+    "image" => "Image",
+    "description" => "Description",
+    "price" => "Price",
+    "actions" => "Actions"
 ];
 
 /* Products page */
@@ -44,6 +53,11 @@ $products_page = [
     "delete" => "Delete",
     "add" => "Add",
     "logout" => "Logout",
+    "name" => "Name",
+    "image" => "Image",
+    "description" => "Description",
+    "price" => "Price",
+    "actions" => "Actions"
 
 ];
 
