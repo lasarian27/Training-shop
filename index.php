@@ -1,35 +1,51 @@
 <?php
-require_once 'languages/en.php';
-$title = $home_page['title'];
-require_once 'layout.php';
+
 require_once 'common.php';
 
-// Logged out user automattically in case of 'logout' action
-if (!isset($_SESSION['loggedin']) || !$_SESSION['loggedin'] || 
-    (isset($_GET['action']) && $_GET['action'] === 'logout')
-)
-{
+$title = translate('title');
+
+// Logout user automattically in case of 'logout' action
+if (isset($_GET['action']) && $_GET['action'] === 'logout') {
     // On logout, destroy the session and redirect to login page
     session_destroy();
-    header("Location: http://localhost/login.php");
-    die();
+    header("Location: " . URL . "login.php");
+}
+
+// If $_SESSION['cart'] doesnt exist create an empty one
+if (!isset($_SESSION['cart'])) {
+    $_SESSION['cart'] = [];
 }
 
 // Insert new id in $_SESSION['cart'] if that id doesnt exist and the action is 'add'
-if(isset($_GET['action']) && $_GET['action'] === "add" && isset($_GET['id']) && !in_array($_GET['id'],$_SESSION['cart']))
-{
+if (isset($_GET['action']) && $_GET['action'] === "add" && isset($_GET['id']) && !in_array($_GET['id'], $_SESSION['cart'])) {
     $_SESSION['cart'][] = $_GET['id'];
 }
 
-// Get all products from db
-$sql = "SELECT id, title, description, price, image FROM products";
-$result = $connect_db->query($sql);
-
-if ($result->num_rows > 0) {
-    // output data
-    showProduct($result, $_SESSION['cart'], str_replace(['/','.php'],'',$_SERVER['PHP_SELF']), $home_page);
-} else {
-    echo "<h6 style='margin:10px 0'>" . $home_page['products_not_found'] . "</h6>";
+// Get products from db that are not in cart
+if (count($_SESSION['cart'])) {
+    $sql = "SELECT * FROM `products` WHERE `id` NOT IN  (".implode(',',$_SESSION['cart']).")";
+}else{
+    $sql = "SELECT * FROM `products`";
 }
 
+$result = $connect_db->prepare($sql);
+$result->execute();
+$products = $result->get_result();
+
 ?>
+
+<?php if($products->num_rows): ?>
+<?php 
+    // output data
+    $cart = $_SESSION['cart'];
+    $pageName = getPageName();
+    require_once 'layout.php';
+    require_once 'cart_template.php';
+?>
+<?php else: ?>
+    <h6 style="margin:10px 0"><?= translate('products_not_found') ?></h6>
+<?php endif ?>
+
+
+</body>
+</html>

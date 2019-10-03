@@ -1,54 +1,54 @@
 <?php
-require_once 'languages/en.php'; 
-$title = $login_page['title'];
-require_once 'layout.php';
+
 require_once 'config.php';
 require_once 'common.php';
 
-
-$username = '';
-$password = '';
+$title = translate('login_title');
+$credentials = [
+    'username' => isset($_POST['username']) ? $_POST['username'] : '' ,
+    'password' => isset($_POST['password']) ? $_POST['password'] : '' ,
+];
+$fields = ['username', 'password'];
+$errors = [];
 
 // Check if the post request was submit
-if(isset($_POST['submit']))
-{
-    $username = strip_tags($_POST['username']);
-    $password = strip_tags($_POST['password']);
-
-    unset($_SESSION['username']);
-    unset($_SESSION['password']);
-
-    // Check every field in particular
-    if(empty($username)){
-        $_SESSION['username']= $login_page['username_required'];
-    }
-
-    if(empty($password)){
-        $_SESSION['password']= $login_page['password_required'];
-    }
-
-    // Check credentials
-    if(!empty($username) && !empty($password))
-    {
-        if($username === USERNAME && $password === PASSWORD){
+if (isset($_POST['submit'])) {
+    array_map(function($el) use ($credentials, &$errors){
+        // Strip HTML and PHP tags from user input
+        $credentials[$el] = strip_tags($_POST[$el]);
+        
+        // If user input is empty
+        if (empty($credentials[$el]))
+        {
+            // Save in $errors a specific message
+            $errors[] = translate($el . '_required');
+        }
+    }, $fields);
+    
+    if (!count($errors)) {
+        // Check credentials
+        if ($credentials['username'] === USERNAME && $credentials['password'] === PASSWORD) {
             $_SESSION['loggedin'] = true;
-            $username === 'admin' ? $_SESSION['admin'] = true : '';
-            $_SESSION['cart'] = [];
+            $credentials['username'] === 'admin' ? $_SESSION['admin'] = true : '';
             // Redirect home
-            header("Location: http://localhost");
-        }else{
+            header("Location: " . URL);
+        } else {
             // Show credentials error
-            echo $login_page['credentials_error'];
+            echo translate('credentials_error');
         }
     }
-   
 }
+
+require_once 'layout.php';
 ?>
 
 <form action="login.php" method="post" style="text-align: center;">
-    <input type="text" placeholder="<?php echo $login_page['username_placeholder']?>" class="form-control" style='margin:10px 0' name="username" value="<?php echo $username ?>">
-    <p style="color:red"><?php echo isset($_SESSION['username']) ?  $_SESSION['username'] : ""?></p>
-    <input type="password" placeholder="<?php echo $login_page['password_placeholder']?>"  class="form-control" style='margin:10px 0' name="password" value="<?php echo $password ?>">
-    <p style="color:red"><?php echo isset($_SESSION['password']) ?  $_SESSION['password'] : ""?></p>
-    <button type="submit" class='btn btn-success' value="click" style='margin: 10px;' name="submit"><?php echo $login_page['login_button']?></button>
+    <input type="text" placeholder="<?= translate('username_placeholder')?>" class="form-control" style='margin:10px 0' name="username" value="<?= $credentials['username'] ?>">
+    <input type="password" placeholder="<?= translate('password_placeholder') ?>"  class="form-control" style='margin:10px 0' name="password" value="<?= $credentials['password'] ?>">
+    <?php showMessages($errors) ?>
+    <button type="submit" class='btn btn-success' value="click" style='margin: 10px;' name="submit"><?= translate('login_button') ?></button>
+    <a href="index.php" class="btn btn-dark" style="margin: 10px;"> <?= translate('go_home') ?> </a>
 </form>
+
+</body>
+</html>
