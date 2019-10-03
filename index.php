@@ -34,16 +34,17 @@ $products = $result->get_result();
 
 ?>
 
+<?php require_once 'layout.php'; ?>
 <?php if($products->num_rows): ?>
 <?php 
     // output data
     $cart = $_SESSION['cart'];
     $pageName = getPageName();
-    require_once 'layout.php';
     require_once 'cart_template.php';
 ?>
 <?php else: ?>
     <h6 style="margin:10px 0"><?= translate('products_not_found') ?></h6>
+    <a href="cart.php" class="btn btn-dark" style="margin: 10px;"> <?= translate('go_to_cart') ?> </a>
 <?php endif ?>
 
 

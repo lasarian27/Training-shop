@@ -55,7 +55,7 @@ if (count($products_cart)) {
         }, $fields);
         
         // Prepare the data for sending the mail
-        if(!count($errors)) {
+        if (!count($errors)) {
             $to      = MANAGER_EMAIL;
             $name = $_POST['name'];
             $comments =  $_POST['comments'];

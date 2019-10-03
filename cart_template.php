@@ -1,5 +1,5 @@
 <?php require_once 'common.php'; ?>
-<table class="table"> 
+<table class="table">
     <thead>
         <tr>
             <th scope="col"> <?= translate('image') ?> </th>
@@ -10,8 +10,10 @@
         </tr>
     </thead>
     <tbody>
+
         <!-- Generate the code for each product -->
         <?php foreach($products as $product): ?>
+
             <!-- Skip the product if its already in $_SESSION['cart'] -->
             <?php $condition = $pageName === 'index' ? !in_array($product['id'], $cart) : true; ?>
             <?php if($condition): ?>
@@ -20,6 +22,7 @@
                     <td><?= $product['title'] ?></td>
                     <td><?= $product['description'] ?></td>
                     <td><?= $product['price'] ?>$</td>
+
                     <!-- Depends on the page print specific code -->
                     <?php if($pageName === "index"): ?>
                         <td><a href="index.php?action=add&id=<?= $product['id'] ?>" class="btn btn-primary"><?= translate('add') ?></a></td>

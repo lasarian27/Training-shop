@@ -1,8 +1,8 @@
 <?php
 
 require_once 'common.php';
+
 $title = translate('product_title');
-require_once 'layout.php';
 
 if (!isset($_SESSION["admin"])) {
     header("Location: " . URL);
@@ -99,8 +99,10 @@ if ($_GET['action'] === "create" || $_GET['action'] === "edit") {
         }
     }
 }
+
 ?>
 
+<?php require_once 'layout.php'; ?>
 <div class="container">
 
 <form action="<?= $_SERVER['REQUEST_URI'] ?>" method="post" class="form-group" enctype="multipart/form-data">

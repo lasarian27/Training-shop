@@ -20,7 +20,7 @@ function imageValidator()
 
     $check = !$_FILES["fileToUpload"]["error"] ? getimagesize($_FILES["fileToUpload"]["tmp_name"]) : false;
 
-    if($check !== false) {
+    if ($check !== false) {
         $uploadOk = 1;
         // Check file size
         if ($_FILES["fileToUpload"]["size"] > 500000) {
@@ -32,7 +32,7 @@ function imageValidator()
             $errors[] = translate('wrong_format');
             $uploadOk = 0;
         }
-            // Check if $uploadOk is set to 0 by an error
+        // Check if $uploadOk is set to 0 by an error
         if ($uploadOk == 0) {
             $errors[] = translate('upload_failed');
         // if everything is ok, try to upload file
