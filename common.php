@@ -1,13 +1,12 @@
 <?php
-
 require_once 'config.php';
-require_once 'translation.php';
+require_once DIR . '/translation.php';
 
 // Start php $_SESSION
 session_start();
 
 // Make a mysqli connection with credentials from 'config.php'
-$connect_db = new mysqli(DB_SERVER_NAME, DB_USERNAME, DB_PASSWORD, DB_NAME);
+$db = new mysqli(DB_SERVER_NAME, DB_USERNAME, DB_PASSWORD, DB_NAME);
 
 /**
  * Checking an image by size and formats
@@ -27,21 +26,21 @@ function imageValidator()
         $uploadOk = 1;
         // Check file size
         if ($_FILES["fileToUpload"]["size"] > 500000) {
-            $errors[] = translate('file_too_large');
+            $errors[] = translate('file.too.large');
             $uploadOk = 0;
         }
         // Allow certain file formats
         if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif") {
-            $errors[] = translate('wrong_format');
+            $errors[] = translate('wrong.format');
             $uploadOk = 0;
         }
         // Check if $uploadOk is set to 0 by an error
         if ($uploadOk == 0) {
-            $errors[] = translate('upload_failed');
+            $errors[] = translate('upload.failed');
             // if everything is ok, try to upload file
         } else {
             if (!move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
-                $errors[] = translate('upload_failed');
+                $errors[] = translate('upload.failed');
             }
         }
     } else {
@@ -61,8 +60,10 @@ function imageValidator()
  */
 function showMessages($data)
 {
-    foreach($data as $item) {
-        echo "<p style=\"color:red\"> $item </p>";
+    if ($data) {
+        foreach ($data as $item) :
+            include_once DIR . '/views/message_template.php';
+        endforeach;
     }
 }
 
@@ -74,9 +75,11 @@ function showMessages($data)
 function translate($word, $language = NULL)
 {
     global $translation;
+
     if (!$language) {
         $language = "en";
     }
+
     return $translation[$language][$word];
 }
 
@@ -92,6 +95,7 @@ function getPageName()
  * @param string $text
  * @return string
  */
-function ht($text) {
+function validation($text)
+{
     return htmlentities($text);
 }

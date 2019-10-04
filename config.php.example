@@ -1,25 +1,28 @@
 <?php
 
-/* URL where the project is hosted */
+// Base directory
+define('DIR', __DIR__ );
+
+// URL where the project is hosted
 define('URL', '');
 
-/* server name */
-define('SERVER_NAME', '');
+// Server name
+define('DB_SERVER_NAME', '');
 
-/* database name */
+// Database name
 define('DB_NAME', '');
 
-/* database username */
+// Database username
 define('DB_USERNAME', '');
 
-/* database password */
+// Database password
 define('DB_PASSWORD', '');
 
-/* admin name */
+// Database username
 define('USERNAME', '');
 
-/* admin password */
+// Database password
 define('PASSWORD', '');
 
-/* shop manager email */
+// Shop manager email
 define('MANAGER_EMAIL', '');

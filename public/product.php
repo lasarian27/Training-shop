@@ -1,24 +1,32 @@
 <?php
-
-require_once 'common.php';
+require_once '../common.php';
 
 if (!isset($_SESSION["admin"])) {
     header("Location: " . URL);
 }
 
+$title = translate('product.title');
 $product = [
     'title' => isset($_POST['title']) ? $_POST['title'] : '',
     'description' => isset($_POST['description']) ? $_POST['description'] : '',
     'price' => isset($_POST['price']) ? $_POST['price'] : ''
 ];
 
-$errors = [];
-$messages = [];
+$errors = [
+    'title' => [],
+    'description' => [],
+    'price' => [],
+    'image' => []
+];
+
+if (isset($_GET['status'])) {
+    echo translate($_GET['status'] ? "success" : "failed");
+}
 
 if ($_GET['action'] === 'delete' && isset($_GET['id']) && isset($_GET['image'])) {
     // Eliminate an image by id
-    $sql = "DELETE FROM `products` WHERE `id`= ? ";
-    $stmt = $connect_db->prepare($sql);
+    $sql = "DELETE FROM `products` WHERE `id`= ?";
+    $stmt = $db->prepare($sql);
     $stmt->bind_param("i", $_GET['id']);
     $stmt->execute();
 
@@ -33,7 +41,7 @@ if ($_GET['action'] === "create" || $_GET['action'] === "edit") {
 
     // If the action is edit autocomplete the inputs with the data from db
     if ($_GET['action'] === "edit" && !isset($_POST['submit'])) {
-        $stmt = $connect_db->prepare("SELECT * FROM `products` WHERE `id`= ? ");
+        $stmt = $db->prepare("SELECT * FROM `products` WHERE `id`= ? ");
         $stmt->bind_param("i", $_GET['id']);
         $stmt->execute();
 
@@ -41,6 +49,8 @@ if ($_GET['action'] === "create" || $_GET['action'] === "edit") {
         $product['title'] = $data['title'];
         $product['description'] = $data['description'];
         $product['price'] = $data['price'];
+        $product['image_url'] = $data['image'];
+
     }
 
     if (isset($_POST['submit'])) {
@@ -49,7 +59,7 @@ if ($_GET['action'] === "create" || $_GET['action'] === "edit") {
             // If user input is empty
             if (empty($product[$key])) {
                 // Save in $_SESSION a specific message
-                $errors[] = translate($key . '_required');
+                $errors[$key][] = translate($key . '.required');
             }
         }
 
@@ -57,65 +67,58 @@ if ($_GET['action'] === "create" || $_GET['action'] === "edit") {
         $image = imageValidator();
 
         if (!$image['upload_ok']) {
-            $errors[] = translate('image_required');
+            $errors['image'][] = translate('image.required');
+            if ($image['errors']) {
+                $errors['image'][] = $image['errors'];
+            }
         }
 
-        // If the image had passed the verification the new product is inserted
-        if (empty($errors)) {
-
-            // Depends on the action specific code is executed
-            if ($_GET['action'] === "edit") {
-                // Update the product from db
-
-                $stmt = $connect_db->prepare("UPDATE `products`  SET `title`= ?, `description`= ?, `price`= ?, `image`= ? WHERE `id`= ?");
-                $stmt->bind_param("ssdsi", $product['title'], $product['description'], $product['price'], $image["name"], $_GET['id']);
-
-                if ($stmt->execute()) {
-                    $messages[] = translate('product_updated');
-                    header("Location: " . URL . "products.php");
-                }
-            } else {
-                // Insert a new product in db
-                $stmt = $connect_db->prepare("INSERT INTO `products` (`title`, `description`, `price`, `image`) VALUES (?,?,?,?)");
-                $stmt->bind_param("ssds", $product['title'], $product['description'], $product['price'], $image["name"]);
-
-                if ($stmt->execute()) {
-                    $messages[] = translate('product_created');
-                    header("Location: " . $_SERVER['REQUEST_URI']);
-                }
+        // Delete status variable from url and
+        // If the image had passed the verification the next code is executed
+        if (!$errors['title'] && !$errors['description'] && !$errors['price'] && !$errors['image']) {
+            $url = $_SERVER['REQUEST_URI'];
+            if (strpos($url, 'status') !== false) {
+                $url = str_replace(["&status=", "0", "1"], '', $url);
             }
 
+            // If the action is edit, edit a product from db, otherwise create one
+            if ($_GET['action'] === "edit") {
+                $stmt = $db->prepare("UPDATE `products`  SET `title`= ?, `description`= ?, `price`= ?, `image`= ? WHERE `id`= ?");
+                $stmt->bind_param("ssdsi", $product['title'], $product['description'], $product['price'], $image["name"], $_GET['id']);
+                header("Location: " . $url . "&status=" . $stmt->execute());
+            } else {
+                $stmt = $db->prepare("INSERT INTO `products` (`title`, `description`, `price`, `image`) VALUES (?, ?, ?, ?)");
+                $stmt->bind_param("ssds", $product['title'], $product['description'], $product['price'], $image["name"]);
+                header("Location: " . $url . "&status=" . $stmt->execute());
+            }
         }
     }
 }
 
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title><?= translate('product_title') ?></title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-</head>
-<body class="container">
+<?php require_once DIR . "/views/header.php" ?>
+
 <form action="<?= $_SERVER['REQUEST_URI'] ?>" method="post" class="form-group" enctype="multipart/form-data">
     <br>
-    <input type="text" placeholder="<?= translate('form_title') ?>" value="<?= $product['title'] ?>" name="title"
+    <input type="text" placeholder="<?= translate('form.title') ?>" value="<?= $product['title'] ?>" name="title"
            class="form-control">
+    <?php showMessages($errors['title']) ?>
     <br>
-    <input type="text" placeholder="<?= translate('form_description') ?>" value="<?= $product['description'] ?>"
+    <input type="text" placeholder="<?= translate('form.description') ?>" value="<?= $product['description'] ?>"
            name="description" class="form-control">
+    <?php showMessages($errors['description']) ?>
     <br>
-    <input type="number" step="any" placeholder="<?= translate('form_price') ?>" value="<?= $product['price'] ?>"
+    <input type="number" step="any" placeholder="<?= translate('form.price') ?>" value="<?= $product['price'] ?>"
            name="price" class="form-control">
+    <?php showMessages($errors['price']) ?>
     <br>
-    <input type="file" name="fileToUpload" class="form-control-file" id="formFile" ?>
-    <?php showMessages($errors) ?>
+    <input type="file" name="fileToUpload" class="form-control-file" id="formFile">
+    <?php showMessages($errors['image']) ?>
     <br>
     <a href="products.php" name="submit" class='btn btn-dark' style='margin: 10px'><?= translate('products') ?></a>
     <button type="submit" value="click" name="submit" class='btn btn-primary'
             style='margin: 10px'><?= translate('save') ?></button>
 </form>
-</body>
-</html>
+
+<?php require_once DIR . "/views/footer.php" ?>
