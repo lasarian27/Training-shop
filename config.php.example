@@ -1,5 +1,8 @@
 <?php
 
+/* URL where the project is hosted */
+define('URL', '');
+
 /* server name */
 define('SERVER_NAME', '');
 

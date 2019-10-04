@@ -3,32 +3,27 @@
 require_once 'config.php';
 require_once 'common.php';
 
-$title = translate('login_title');
 $credentials = [
-    'username' => isset($_POST['username']) ? $_POST['username'] : '' ,
-    'password' => isset($_POST['password']) ? $_POST['password'] : '' ,
+    'username' => isset($_POST['username']) ? $_POST['username'] : '',
+    'password' => isset($_POST['password']) ? $_POST['password'] : '',
 ];
-$fields = ['username', 'password'];
 $errors = [];
 
 // Check if the post request was submit
 if (isset($_POST['submit'])) {
-    array_map(function($el) use ($credentials, &$errors){
-        // Strip HTML and PHP tags from user input
-        $credentials[$el] = strip_tags($_POST[$el]);
-        
+
+    foreach ($credentials as $key => $value) {
         // If user input is empty
-        if (empty($credentials[$el]))
-        {
-            // Save in $errors a specific message
-            $errors[] = translate($el . '_required');
+        if (empty($credentials[$key])) {
+            // Save in $_SESSION a specific message
+            $errors[] = translate($key . '_required');
         }
-    }, $fields);
-    
+    }
+
     if (!count($errors)) {
         // Check credentials
         if ($credentials['username'] === USERNAME && $credentials['password'] === PASSWORD) {
-            $_SESSION['loggedin'] = true;
+            $_SESSION['login'] = true;
             $credentials['username'] === 'admin' ? $_SESSION['admin'] = true : '';
             // Redirect home
             header("Location: " . URL);
@@ -39,16 +34,25 @@ if (isset($_POST['submit'])) {
     }
 }
 
-require_once 'layout.php';
 ?>
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title><?= translate('login_title') ?></title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body class="container">
 <form action="login.php" method="post" style="text-align: center;">
-    <input type="text" placeholder="<?= translate('username_placeholder')?>" class="form-control" style='margin:10px 0' name="username" value="<?= $credentials['username'] ?>">
-    <input type="password" placeholder="<?= translate('password_placeholder') ?>"  class="form-control" style='margin:10px 0' name="password" value="<?= $credentials['password'] ?>">
+    <input type="text" placeholder="<?= translate('username_placeholder') ?>" class="form-control" style='margin:10px 0'
+           name="username" value="<?= $credentials['username'] ?>">
+    <input type="password" placeholder="<?= translate('password_placeholder') ?>" class="form-control"
+           style='margin:10px 0' name="password" value="<?= $credentials['password'] ?>">
     <?php showMessages($errors) ?>
-    <button type="submit" class='btn btn-success' value="click" style='margin: 10px;' name="submit"><?= translate('login_button') ?></button>
+    <button type="submit" class='btn btn-success' value="click" style='margin: 10px;'
+            name="submit"><?= translate('login_button') ?></button>
     <a href="index.php" class="btn btn-dark" style="margin: 10px;"> <?= translate('go_home') ?> </a>
 </form>
-
 </body>
 </html>
