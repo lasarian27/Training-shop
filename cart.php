@@ -36,6 +36,10 @@ if (count($products_cart)) {
                 // Save in $_SESSION a specific message
                 $errors[] = translate($key . '_required');
             }
+
+            if ($key === "email" && !filter_var($contact[$key], FILTER_VALIDATE_EMAIL)) {
+                $errors[] = translate($key . '_required');
+            }
         }
 
         // Prepare the data for sending the mail

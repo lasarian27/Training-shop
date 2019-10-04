@@ -7,9 +7,12 @@ require_once 'translation.php';
 session_start();
 
 // Make a mysqli connection with credentials from 'config.php'
-$connect_db = new mysqli(SERVER_NAME, DB_USERNAME, DB_PASSWORD, DB_NAME);
+$connect_db = new mysqli(DB_SERVER_NAME, DB_USERNAME, DB_PASSWORD, DB_NAME);
 
-// Checking an image by size and formats
+/**
+ * Checking an image by size and formats
+ * @return array
+ */
 function imageValidator()
 {
     $target_dir = "images/";
@@ -52,14 +55,22 @@ function imageValidator()
     ];
 }
 
-// Show different messages
+/**
+ * Show different messages
+ * @param array $data
+ */
 function showMessages($data)
 {
-    array_map(function ($el) {
-        echo "<p style=\"color:red\"> $el </p>";
-    }, $data);
+    foreach($data as $item) {
+        echo "<p style=\"color:red\"> $item </p>";
+    }
 }
 
+/**
+ * @param string $word
+ * @param null $language
+ * @return mixed
+ */
 function translate($word, $language = NULL)
 {
     global $translation;
@@ -69,7 +80,18 @@ function translate($word, $language = NULL)
     return $translation[$language][$word];
 }
 
+/**
+ * @return mixed
+ */
 function getPageName()
 {
-    return str_replace(['/', '.php', 'asdf'], '', $_SERVER['PHP_SELF']);
+    return str_replace(['/', '.php'], '', $_SERVER['PHP_SELF']);
+}
+
+/**
+ * @param string $text
+ * @return string
+ */
+function ht($text) {
+    return htmlentities($text);
 }
